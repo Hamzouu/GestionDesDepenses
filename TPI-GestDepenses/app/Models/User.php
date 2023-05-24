@@ -42,4 +42,27 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function participatedActivities()
+    {
+        return $this->belongsToMany(Activity::class, 'participates', 'user_id', 'activity_id');
+    }
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class, 'participates', 'user_id', 'activity_id');
+    }
+
+     // Relation activitySuperuser avec la table activities
+     public function activitySuperuser()
+     {
+         return $this->hasMany(Activity::class, 'super_user_id');
+     }
+ 
+     // Vérifie si l'utilisateur est un super utilisateur
+     public function isSuperUser()
+     {
+         // Vérifie si l'utilisateur a au moins une activité en tant que super utilisateur
+         return $this->activitySuperuser()->exists();
+     }
+ 
+
 }

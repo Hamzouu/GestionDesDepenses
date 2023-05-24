@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +28,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
+    Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
+    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+    Route::get('/activities/{activity}', [ActivityController::class, 'show'])->name('activities.show');
+    Route::get('/activities/category/{category}', [ActivityController::class, 'filterByCategory'])->name('activities.filterByCategory');
+
+    // Afficher la page de modification de l'activité
+    Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
+
+    // Mettre à jour l'activité
+    Route::put('/activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
+
+    // Supprimer l'activité
+    Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+    
+
+
 });
 
 require __DIR__.'/auth.php';
