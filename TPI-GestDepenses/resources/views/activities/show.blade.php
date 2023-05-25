@@ -40,20 +40,12 @@
                     <tbody>
                         @foreach($activity->expenses as $expense)
                             <tr>
-                                <td class="border border-gray-300 px-2 py-1">{{ $expense->name }}</td>
+                                <td class="border border-gray-300 px-2 py-1">{{ $expense->title }}</td>
                                 <td class="border border-gray-300 px-2 py-1">{{ $expense->amount }}</td>
-                                <td class="border border-gray-300 px-2 py-1">{{ $expense->date }}</td>
+                                <td class="border border-gray-300 px-2 py-1">{{ $expense->created_at }}</td>
                                 <td class="border border-gray-300 px-2 py-1">{{ $expense->category }}</td>
                                 <td class="border border-gray-300 px-2 py-1">
-                                    <a href="{{ route('expenses.show', $expense->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded">Voir la dépense</a>
-                                    @if(Auth::id() == $activity->user_id || Auth::user()->isSuperUser())
-                                        <a href="{{ route('expenses.edit', $expense->id) }}" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded">Modifier</a>
-                                        <form action="{{ route('expenses.destroy', $expense->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded">Supprimer</button>
-                                        </form>
-                                    @endif
+                               
                                 </td>
                             </tr>
                         @endforeach

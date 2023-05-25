@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
     Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
@@ -43,8 +44,16 @@ Route::middleware('auth')->group(function () {
     // Supprimer l'activité
     Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
     
+    Route::get('/activities/{activity}/expenses/create', [ActivityController::class, 'createExpense'])->name('activities.expenses.create');
+    Route::post('/activities/{activity}/expenses', [ActivityController::class, 'storeExpense'])->name('activities.expenses.store');
+    Route::put('/activities/{activity}/expenses/{expense}', [ActivityController::class, 'updateExpense'])->name('activities.expenses.update');
+    Route::delete('/activities/{activity}/expenses/{expense}', [ActivityController::class, 'destroyExpense'])->name('activities.expenses.destroy');
 
 
-});
+
+
+}); 
+
+
 
 require __DIR__.'/auth.php';
