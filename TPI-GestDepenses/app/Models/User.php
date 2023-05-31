@@ -63,6 +63,11 @@ class User extends Authenticatable
          // Vérifie si l'utilisateur a au moins une activité en tant que super utilisateur
          return $this->activitySuperuser()->exists();
      }
+
+     public function expenses()
+    {
+        return $this->belongsToMany(Expense::class, 'expense_participants');
+    }
  
 
 }

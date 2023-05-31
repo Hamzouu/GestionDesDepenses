@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class expenseCategory extends Model
 {
     use HasFactory;
 
-    public function activities()
+    protected $fillable = ['name'];
+
+    public function expenses()
     {
-        return $this->hasMany(Activity::class);
+        return $this->hasMany(Expense::class);
     }
+
+
 }

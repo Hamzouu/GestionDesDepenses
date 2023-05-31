@@ -34,29 +34,51 @@
                             <th class="bg-gray-100 border border-gray-300 px-2 py-1">Montant</th>
                             <th class="bg-gray-100 border border-gray-300 px-2 py-1">Date</th>
                             <th class="bg-gray-100 border border-gray-300 px-2 py-1">Catégorie</th>
+                            <th class="bg-gray-100 border border-gray-300 px-2 py-1">Participants</th>
                             <th class="bg-gray-100 border border-gray-300 px-2 py-1">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($activity->expenses as $expense)
-                            <tr>
-                                <td class="border border-gray-300 px-2 py-1">{{ $expense->title }}</td>
-                                <td class="border border-gray-300 px-2 py-1">{{ $expense->amount }}</td>
-                                <td class="border border-gray-300 px-2 py-1">{{ $expense->created_at }}</td>
-                                <td class="border border-gray-300 px-2 py-1">{{ $expense->category }}</td>
-                                <td class="border border-gray-300 px-2 py-1">
-                               
-                                </td>
-                            </tr>
-                        @endforeach
+                    @foreach($activity->expenses as $expense)
+                        <tr>
+                            <td class="border border-gray-300 px-2 py-1">{{ $expense->title }}</td>
+                            <td class="border border-gray-300 px-2 py-1">{{ $expense->amount }}</td>
+                            <td class="border border-gray-300 px-2 py-1">{{ $expense->created_at }}</td>
+                            <td class="border border-gray-300 px-2 py-1">
+                                @if ($expense->category)
+                                    {{ $expense->category->name }}
+                                @else
+                                    N/A
+                                @endif
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1">
+                                @foreach($expense->participants as $participant)
+                                    {{ $participant->name }} ¦
+                                @endforeach
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1">
+                            <!-- Actions -->
+                            <div class="flex">
+                                <a href="{{ route('expenses.edit', ['activity' => $activity->id, 'expense' => $expense->id]) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mr-2">Modifier</a>
+                                <form action="{{ route('expenses.destroy', ['activity' => $activity->id, 'expense' => $expense->id]) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+
+                        </tr>
+                    @endforeach
                     </tbody>
                 </table>
                 @if(Auth::id() == $activity->user_id || Auth::user()->isSuperUser())
                     <div class="mt-4">
-                        <a href="{{ route('activities.expenses.create', $activity->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Ajouter une dépense</a>
+                        <a href="{{ route('expenses.create', $activity->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Ajouter une dépense</a>
                     </div>
                 @endif
             </div>
+            
         </div>
     </div>
 </x-app-layout>

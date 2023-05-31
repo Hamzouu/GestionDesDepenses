@@ -28,7 +28,7 @@
                         <div class="mt-4">
                             <a href="{{ route('activities.show', $activity->id) }}" class="inline-block bg-blue-500 text-white py-2 px-4 rounded">Voir activité</a>
                             @if($activity->user_id === Auth::id())
-                                <a href="{{ route('activities.edit', $activity->id) }}" class="inline-block bg-green-500 text-white py-2 px-4 rounded">Modifier</a>
+                                <a href="{{ route('activities.edit', $activity->id) }}" class="inline-block bg-green-500 text-white py-2 px-4 rounded"> Modifier </a>
                                 <form action="{{ route('activities.destroy', $activity->id) }}" method="POST" class="inline-block">
                                     @csrf
                                     @method('DELETE')

@@ -44,10 +44,13 @@ Route::middleware('auth')->group(function () {
     // Supprimer l'activité
     Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
     
-    Route::get('/activities/{activity}/expenses/create', [ActivityController::class, 'createExpense'])->name('activities.expenses.create');
-    Route::post('/activities/{activity}/expenses', [ActivityController::class, 'storeExpense'])->name('activities.expenses.store');
-    Route::put('/activities/{activity}/expenses/{expense}', [ActivityController::class, 'updateExpense'])->name('activities.expenses.update');
-    Route::delete('/activities/{activity}/expenses/{expense}', [ActivityController::class, 'destroyExpense'])->name('activities.expenses.destroy');
+    Route::get('/activities/{activity}/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
+    Route::post('/activities/{activity}/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::put('/activities/{activity}/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
+
+
+    Route::get('/expenses/{activity}/edit/{expense}', [ExpenseController::class, 'edit'])->name('expenses.edit');
+    Route::delete('/activities/{activity}/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 
 
 
