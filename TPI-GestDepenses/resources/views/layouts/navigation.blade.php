@@ -5,14 +5,14 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-10 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('home') }}">
                         TPI-GestionDesDepenses
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('home')">
+                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ __('Accueil') }}
                     </x-nav-link>
                 </div>
@@ -33,17 +33,25 @@
 
                  <!-- Navigation Links -->
                  <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('home')">
+                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ __('Résumé des dépenses') }}
                     </x-nav-link>
                 </div>
 
                  <!-- Navigation Links -->
                  <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('home')">
+                    <x-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
                         {{ __('Contact') }}
                     </x-nav-link>
                 </div>
+
+                @if (Auth::check() && Auth::user()->idrole === 1)
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('admin.userList')" :active="request()->routeIs('admin.userList')">
+                        {{ __('Administrateur') }}
+                    </x-nav-link>
+                </div>
+                @endif
             </div>
 
             <!-- Settings Dropdown -->
@@ -95,8 +103,8 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+            <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
+                {{ __('home') }}
             </x-responsive-nav-link>
         </div>
 

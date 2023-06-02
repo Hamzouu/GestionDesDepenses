@@ -26,15 +26,5 @@ class Expense extends Model
         return $this->belongsTo(ExpenseCategory::class, 'category_id');
     }
 
-    public function authorize(User $user)
-    {
-        // Vérifie si l'utilisateur courant est le superUtilisateur de l'activité
-        if ($user->isSuperUser($this->activity_id)) {
-            return true; // Autorisation accordée pour le superUtilisateur
-        }
-
-        // Vérifie si l'utilisateur courant est l'auteur de la dépense
-        return $user->id === $this->user_id;
-    }
 
 }

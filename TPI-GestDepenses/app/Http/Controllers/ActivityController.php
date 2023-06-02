@@ -62,29 +62,29 @@ class ActivityController extends Controller
 
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'category_id' => 'required|exists:categories,id',
-        ]);
-        
-        $activity = new Activity();
-        $activity->title = $request->input('title');
-        $activity->description = $request->input('description');
-        $activity->category_id = $request->input('category_id');
-        $activity->user_id = Auth::id(); // Utilise l'ID de l'utilisateur actuellement connecté
-        $activity->save();
-        
-        // Récupération des utilisateurs sélectionnés
-        $selectedUsers = $request->input('users');
-        
-        // Association des utilisateurs à l'activité
-        $activity->users()->sync($selectedUsers);
-        
-        return redirect()->route('dashboard')->with('success', 'L\'activité a été créée avec succès.');
-        
-    }
+{
+    $request->validate([
+        'title' => 'required',
+        'description' => 'required',
+        'category_id' => 'required|exists:categories,id',
+    ]);
+    
+    $activity = new Activity();
+    $activity->title = $request->input('title');
+    $activity->description = $request->input('description');
+    $activity->category_id = $request->input('category_id');
+    $activity->user_id = Auth::id(); // Utilise l'ID de l'utilisateur actuellement connecté
+    $activity->super_user_id = Auth::id(); // Remplit le champ "super_user_id" avec l'ID de l'utilisateur actuellement connecté
+    $activity->save();
+    
+    // Récupération des utilisateurs sélectionnés
+    $selectedUsers = $request->input('users');
+    
+    // Association des utilisateurs à l'activité
+    $activity->users()->sync($selectedUsers);
+    
+    return redirect()->route('dashboard')->with('success', 'L\'activité a été créée avec succès.');
+}
 
     public function show($id, Activity $activitiy)
     {
@@ -110,17 +110,36 @@ class ActivityController extends Controller
     {
         $activity = Activity::findOrFail($id);
         $categories = Category::all();
+        $users = User::all();
         
-        return view('activities.edit', compact('activity', 'categories'));
+        return view('activities.edit', compact('activity', 'categories', 'users'));
     }
+
+    
     
     public function update(Request $request, Activity $activity)
     {
         $activity->update($request->all());
+        
+        // Récupération des utilisateurs sélectionnés
+        $selectedUsers = $request->input('users', []);
+        
+        // Récupération des participants existants
+        $existingUsers = $activity->users->pluck('id')->toArray();
+        
+        // Ajout des nouveaux participants
+        $newUsers = array_diff($selectedUsers, $existingUsers);
+        $activity->users()->attach($newUsers);
+        
+        // Suppression des participants retirés
+        $removedUsers = array_diff($existingUsers, $selectedUsers);
+        $activity->users()->detach($removedUsers);
 
         return redirect()->route('activities.show', $activity->id)
                         ->with('success', 'L\'activité a été mise à jour avec succès.');
     }
+
+
 
     public function destroy(Activity $activity)
     {

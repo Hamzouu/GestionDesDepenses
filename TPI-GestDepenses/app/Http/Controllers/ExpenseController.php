@@ -61,9 +61,11 @@ class ExpenseController extends Controller
         $activity = Activity::find($activity);
         $expense = Expense::find($expense);
         $categories = ExpenseCategory::all();
+        $users = $activity->users; // Récupérer les utilisateurs associés à l'activité
 
-        return view('expenses.edit', compact('activity', 'expense', 'categories'));
+        return view('expenses.edit', compact('activity', 'expense', 'categories', 'users'));
     }
+
 
     public function update(Request $request, $activity, $expense)
     {
@@ -76,8 +78,7 @@ class ExpenseController extends Controller
 
         $expense = Expense::findOrFail($expense);
 
-        // Vérifie si l'utilisateur courant est autorisé à modifier la dépense
-        $this->authorize('update', $expense);
+        
 
         $expense->title = $request->input('title');
         $expense->amount = $request->input('amount');
@@ -85,10 +86,21 @@ class ExpenseController extends Controller
         $expense->category_id = $request->input('category');
         $expense->save();
 
+        // Ajouter les participants sélectionnés
+        $participants = $request->input('participants', []);
+        $existingParticipants = $expense->participants->pluck('id')->toArray();
+
+        // Ajouter les nouveaux participants à la liste existante
+        $participantsToAdd = array_diff($participants, $existingParticipants);
+        $expense->participants()->attach($participantsToAdd);
+
+        
+
         $activity = Activity::findOrFail($activity);
 
         return redirect()->route('activities.show', $activity)->with('success', 'Expense updated successfully.');
     }
+
 
     public function destroy($activity, $expense)
     {

@@ -15,7 +15,7 @@
                     </ul>
                 </div>
 
-                @if(Auth::id() == $activity->user_id)
+                @if(Auth::id() == $activity->user_id || Auth::id() == $activity->super_user_id)
                     <a href="{{ route('activities.edit', $activity->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Modifier</a>
                     <form action="{{ route('activities.destroy', $activity->id) }}" method="POST" class="mt-2">
                         @csrf
@@ -57,26 +57,24 @@
                                 @endforeach
                             </td>
                             <td class="border border-gray-300 px-2 py-1">
-                            <!-- Actions -->
-                            <div class="flex">
-                                <a href="{{ route('expenses.edit', ['activity' => $activity->id, 'expense' => $expense->id]) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mr-2">Modifier</a>
-                                <form action="{{ route('expenses.destroy', ['activity' => $activity->id, 'expense' => $expense->id]) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Supprimer</button>
-                                </form>
-                            </div>
-                        </td>
-
+                                @if(Auth::id() == $activity->user_id || Auth::id() == $activity->super_user_id)
+                                    <div class="flex">
+                                        <a href="{{ route('expenses.edit', ['activity' => $activity->id, 'expense' => $expense->id]) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mr-2">Modifier</a>
+                                        <form action="{{ route('expenses.destroy', ['activity' => $activity->id, 'expense' => $expense->id]) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Supprimer</button>
+                                        </form>
+                                    </div>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
-                @if(Auth::id() == $activity->user_id || Auth::user()->isSuperUser())
                     <div class="mt-4">
                         <a href="{{ route('expenses.create', $activity->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Ajouter une dépense</a>
                     </div>
-                @endif
             </div>
             
         </div>

@@ -30,6 +30,15 @@
                     @endforeach
                 </select>
             </div>
+            <div class="mb-4">
+                <label for="participants" class="block text-sm font-medium text-gray-700">Participants</label>
+                @foreach($users as $user)
+                    <div>
+                        <input type="checkbox" id="user_{{ $user->id }}" name="participants[]" value="{{ $user->id }}" {{ in_array($user->id, $expense->participants->pluck('id')->toArray()) ? 'checked disabled' : '' }}>
+                        <label for="user_{{ $user->id }}">{{ $user->name }}</label>
+                    </div>
+                @endforeach
+            </div>
 
             <div class="flex justify-end">
                 <a href="{{ route('activities.show', ['activity' => $activity->id, 'expense' => $expense->id]) }}" class="mr-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded">Annuler</a>
