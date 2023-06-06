@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActivityController;
@@ -22,19 +23,23 @@ Route::get('/', function () {
 
 Route::get('/home', function () {
     return view('home');
-})->middleware(['auth', 'verified'])->name('home');
+})->middleware(['auth', 'verified', 'check_approval'])->name('home');
 
 Route::get('/contact', function () {
     return view('contact');
-})->middleware(['auth', 'verified'])->name('contact');
+})->middleware(['auth', 'verified','check_approval'])->name('contact');
+
+Route::get('/waiting-approval', function () {
+    return view('waiting-approval');
+})->name('waiting-approval')->middleware('check_approval');
 
 
-
-Route::middleware('auth')->group(function () {
+Route::middleware('auth','check_approval' )->group(function () {
 
 
     
     Route::get('/admin', [AdminController::class, 'listUsers'])->name('admin.userList');
+    Route::post('/admin/approve/{user}', [AdminController::class, 'approveUser'])->name('admin.approveUser');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -8,6 +8,7 @@ use App\Models\Activity;
 use App\Models\Category;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
+use Illuminate\Support\Facades\DB;
 
 class ExpenseController extends Controller
 {
@@ -104,14 +105,67 @@ class ExpenseController extends Controller
 
     public function destroy($activity, $expense)
     {
-        $expense = Expense::findOrFail($expense);
-        
-        // Delete related expense participants
-        $expense->participants()->delete();
-        
-        $expense->delete();
-        
-        return redirect()->back()->with('success', 'La dépense a été supprimée avec succès.');
-
+        try {
+            $expense = Expense::findOrFail($expense);
+    
+            // Detach related expense participants
+            $expense->participants()->detach();
+    
+            // Get the user associated with the expense
+            $user = $expense->user;
+    
+            $expense->delete();
+    
+            // Delete the user if there are no more related expense participants
+            if ($user && $user->expenses()->count() === 0) {
+                $user->delete();
+            }
+    
+            return redirect()->back()->with('success', 'La dépense a été supprimée avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Une erreur s\'est produite lors de la suppression de la dépense.');
+        }
     }
+
+    public function summary($activity)
+    {
+        $activity = Activity::findOrFail($activity);
+
+        // Récupérer les dépenses de l'activité avec les utilisateurs associés
+        $expenses = Expense::where('activity_id', $activity->id)
+            ->with('participants')
+            ->get();
+
+        // Tableau pour stocker les montants dus par chaque utilisateur
+        $balances = [];
+
+        // Calculer les montants dus par chaque utilisateur
+        foreach ($expenses as $expense) {
+            $totalParticipants = $expense->participants->count();
+
+            // Montant divisé par le nombre total de participants
+            $amountPerParticipant = $expense->amount / $totalParticipants;
+
+            // Montant dû à l'utilisateur ayant créé la dépense
+            $amountDueToUser = $amountPerParticipant * ($totalParticipants - 1);
+
+            foreach ($expense->participants as $participant) {
+                if ($participant->id != $expense->user_id) {
+                    $balanceKey = $participant->name . ' doit ' . $amountDueToUser . ' à ' . $expense->user->name;
+                    $balances[$balanceKey] = $amountDueToUser;
+
+                    // Ajouter le montant dû à l'utilisateur créant la dépense dans le total de l'utilisateur
+                    if (isset($balances[$participant->name])) {
+                        $balances[$participant->name] += $amountDueToUser;
+                    } else {
+                        $balances[$participant->name] = $amountDueToUser;
+                    }
+                }
+            }
+        }
+
+        return view('expenses.summary', compact('activity', 'balances'));
+    }
+
+
 }

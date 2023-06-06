@@ -15,7 +15,7 @@
                     </ul>
                 </div>
 
-                @if(Auth::id() == $activity->user_id || Auth::id() == $activity->super_user_id)
+                @if(Auth::id() == $activity->user_id || Auth::id() == $activity->super_user_id || auth()->user()->idrole === 1)
                     <a href="{{ route('activities.edit', $activity->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Modifier</a>
                     <form action="{{ route('activities.destroy', $activity->id) }}" method="POST" class="mt-2">
                         @csrf
@@ -39,44 +39,64 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @foreach($activity->expenses as $expense)
-                        <tr>
-                            <td class="border border-gray-300 px-2 py-1">{{ $expense->title }}</td>
-                            <td class="border border-gray-300 px-2 py-1">{{ $expense->amount }}</td>
-                            <td class="border border-gray-300 px-2 py-1">{{ $expense->created_at }}</td>
-                            <td class="border border-gray-300 px-2 py-1">
-                                @if ($expense->category)
-                                    {{ $expense->category->name }}
-                                @else
-                                    N/A
-                                @endif
-                            </td>
-                            <td class="border border-gray-300 px-2 py-1">
-                                @foreach($expense->participants as $participant)
-                                    {{ $participant->name }} ¦
-                                @endforeach
-                            </td>
-                            <td class="border border-gray-300 px-2 py-1">
-                                @if(Auth::id() == $activity->user_id || Auth::id() == $activity->super_user_id)
-                                    <div class="flex">
-                                        <a href="{{ route('expenses.edit', ['activity' => $activity->id, 'expense' => $expense->id]) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mr-2">Modifier</a>
-                                        <form action="{{ route('expenses.destroy', ['activity' => $activity->id, 'expense' => $expense->id]) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Supprimer</button>
-                                        </form>
-                                    </div>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
+                        @foreach($activity->expenses as $expense)
+                            <tr>
+                                <td class="border border-gray-300 px-2 py-1">{{ $expense->title }}</td>
+                                <td class="border border-gray-300 px-2 py-1">{{ $expense->amount }}</td>
+                                <td class="border border-gray-300 px-2 py-1">{{ $expense->created_at }}</td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    @if ($expense->category)
+                                        {{ $expense->category->name }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    @foreach($expense->participants as $participant)
+                                        {{ $participant->name }} ¦
+                                    @endforeach
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    @if(Auth::id() == $activity->user_id || Auth::id() == $activity->super_user_id || auth()->user()->idrole === 1)
+                                        <div class="flex">
+                                            <a href="{{ route('expenses.edit', ['activity' => $activity->id, 'expense' => $expense->id]) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mr-2">Modifier</a>
+                                            <form action="{{ route('expenses.destroy', ['activity' => $activity->id, 'expense' => $expense->id]) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Supprimer</button>
+                                            </form>
+                                        </div>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
-                    <div class="mt-4">
-                        <a href="{{ route('expenses.create', $activity->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Ajouter une dépense</a>
-                    </div>
+                <div class="mt-4">
+                    <a href="{{ route('expenses.create', $activity->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Ajouter une dépense</a>
+                </div>
             </div>
-            
         </div>
+
+        <div class="mt-8">
+            <h2 class="text-xl font-bold mb-4">Récapitulatif des dépenses</h2>
+            <table class="w-full text-sm">
+                <thead>
+                    <tr>
+                        <th class="bg-gray-100 border border-gray-300 px-2 py-1">Participant</th>
+                        <th class="bg-gray-100 border border-gray-300 px-2 py-1">Montant dû</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($participantsBalances as $participant => $balance)
+                        <tr>
+                            <td class="border border-gray-300 px-2 py-1">{{ $participant }}</td>
+                            <td class="border border-gray-300 px-2 py-1">{{ $balance }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </x-app-layout>

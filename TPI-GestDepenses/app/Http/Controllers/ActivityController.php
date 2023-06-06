@@ -83,17 +83,53 @@ class ActivityController extends Controller
     // Association des utilisateurs à l'activité
     $activity->users()->sync($selectedUsers);
     
-    return redirect()->route('dashboard')->with('success', 'L\'activité a été créée avec succès.');
+    return redirect()->route('activities.index')->with('success', 'L\'activité a été créée avec succès.');
+    }   
+
+    public function show($id)
+{
+    $activity = Activity::findOrFail($id);
+    $expenses = Expense::where('activity_id', $id)->get();
+
+    $user = Auth::user();
+    if (!$user) {
+        // Handle the case when the user is not authenticated
+        // or assign a default user if appropriate
+        $user = null;
+    }
+
+    $participantsBalances = [];
+    $userBalance = 0; // Balance for the current user
+
+    if ($expenses) {
+        foreach ($activity->participants as $participant) {
+            $participantBalance = 0;
+            foreach ($expenses as $expense) {
+                $totalParticipants = $expense->participants->count();
+                if ($totalParticipants > 0) {
+                    $amountPerParticipant = $expense->amount / $totalParticipants;
+
+                    if ($expense->user_id === $user->id) {
+                        // Ignore the expense if the user is the creator
+                        continue;
+                    }
+
+                    if ($expense->participants->contains('id', $participant->id)) {
+                        $participantBalance += $amountPerParticipant;
+
+                        if ($participant->id === $user->id) {
+                            $userBalance -= $amountPerParticipant;
+                        }
+                    }
+                }
+            }
+            $participantsBalances[$participant->name] = $participantBalance;
+        }
+    }
+
+    return view('activities.show', compact('activity', 'user', 'expenses', 'participantsBalances', 'userBalance'));
 }
 
-    public function show($id, Activity $activitiy)
-    {
-        $activity = Activity::findOrFail($id);
-        $user = User::findOrFail($activity->user_id);
-        $expenses = Expense::where('activity_id', $activity->id)->get();
-
-        return view('activities.show', compact('activity', 'user', 'expenses'));
-    }
 
 
     public function filterByCategory(Category $category)
