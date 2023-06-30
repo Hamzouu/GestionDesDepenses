@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('activities', function (Blueprint $table) {
+        Schema::create('activities', function (Blueprint $table) {
             $table->unsignedBigInteger('super_user_id')->nullable();
             $table->foreign('super_user_id')->references('id')->on('users');
         });
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('activities', function (Blueprint $table) {
+        Schema::dropIfExists('activities', function (Blueprint $table) {
             //
         });
     }
